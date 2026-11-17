@@ -33,7 +33,7 @@ git clone git@github.com:nankonyo/opencode-path-view.git ~/opencode-path-view
 ```json title="~/.config/opencode/cli.json"
 {
   "$schema": "https://opencode.ai/v2/cli.json",
-  "plugins": ["~/opencode-path-view"]
+  "plugins": ["/home/me/opencode-path-view"]
 }
 ```
 
