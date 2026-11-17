@@ -1,8 +1,12 @@
 {
   "name": "opencode-path-view",
-  "version": "0.1.0",
-  "description": "OpenCode TUI plugin that shows the current session directory and git branch centered in the prompt footer.",
+  "version": "0.2.0",
+  "description": "OpenCode TUI plugin that shows user@host, the current session directory, and the git branch centered in the prompt footer.",
   "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "typecheck": "tsc --noEmit"
+  },
   "exports": {
     "./tui": "./src/tui.tsx"
   },
@@ -31,5 +35,9 @@
     "@opentui/core": ">=0.6.6",
     "@opentui/solid": ">=0.6.6",
     "solid-js": ">=1.9.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "typescript": "^5.9.3"
   }
 }

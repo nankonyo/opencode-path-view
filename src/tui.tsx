@@ -1,13 +1,24 @@
 import { Plugin, usePlugin } from "@opencode/plugin/tui"
 import { Show, createMemo } from "solid-js"
+import { hostname, userInfo } from "node:os"
+import { identityLabel } from "./identity.js"
+
+const identity = (() => {
+  try {
+    return identityLabel(userInfo().username, hostname())
+  } catch {
+    return ""
+  }
+})()
 
 /**
- * Renders the active session directory (plus the current git branch when the
- * directory is inside a repository) centered in the prompt footer.
+ * Renders the active session directory, preceded by the current `user@host`
+ * and followed by the current git branch when the directory is inside a
+ * repository, centered in the prompt footer.
  *
  * The built-in activity indicator (`esc interrupt`, spinner) keeps the left
  * side and usage/shortcut hints keep the right side, so this only draws the
- * path itself.
+ * location itself.
  */
 function SessionPath(props: { sessionID?: string; compact: boolean }) {
   const context = usePlugin()
@@ -18,11 +29,13 @@ function SessionPath(props: { sessionID?: string; compact: boolean }) {
   })
 
   const label = createMemo(() => {
+    if (!props.sessionID) return
     const loc = location()
     if (!loc) return
     const path = props.compact ? context.ui.format.path(loc.directory) : loc.directory
     const branch = context.data.location.vcs.info(loc)?.branch.current
-    return branch ? `${path}:${branch}` : path
+    const target = branch ? `${path}:${branch}` : path
+    return identity ? `${identity}:${target}` : target
   })
 
   return (
@@ -50,14 +63,15 @@ export default Plugin.define({
   setup(context) {
     const compact = context.options.compact === true
 
-    const syncLocation = () => {
-      const location = context.location ?? context.data.location.default()
-      if (location) void context.data.location.vcs.sync(location)
+    const syncLocation = (location?: { directory: string; workspaceID?: string }) => {
+      const target = location ?? context.location ?? context.data.location.default()
+      if (target) void context.data.location.vcs.sync(target)
     }
 
     syncLocation()
 
-    const stop = context.data.on("session.updated", syncLocation)
+    const stopMoved = context.data.on("session.moved", (event) => syncLocation(event.data.location))
+    const stopWorktree = context.data.on("worktree.updated", () => syncLocation())
 
     context.ui.slot({
       append: "prompt.footer",
@@ -66,6 +80,9 @@ export default Plugin.define({
       ),
     })
 
-    return () => stop()
+    return () => {
+      stopMoved()
+      stopWorktree()
+    }
   },
 })

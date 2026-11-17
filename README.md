@@ -1,21 +1,24 @@
 # opencode-path-view
 
-A small [OpenCode](https://opencode.ai) TUI plugin that shows **where the current session is running**: the working
-directory, plus the git branch when the directory is inside a repository.
+A small [OpenCode](https://opencode.ai) TUI plugin that shows **where the current session is running**: the current
+`user@host`, the working directory, plus the git branch when the directory is inside a repository.
 
-The path is drawn in the **center of the prompt footer**, so the built-in activity indicator (`esc interrupt`, spinner)
-stays on the left and the usage / shortcut hints stay on the right.
+The location is drawn in the **center of the prompt footer**, so the built-in activity indicator (`esc interrupt`,
+spinner) stays on the left and the usage / shortcut hints stay on the right.
 
 ```text
 ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
- ⬝⬝■■■■ esc interrupt        /home/me/project        ↓ 1 shell · 97.2K (49%)  ctrl+p commands
- └──── activity ────┘        └──── path ────┘       └───────── usage ─────────┘
+ ⬝⬝■■■■ esc interrupt   dev@modulixs.com:/home/me/project:main   ↓ 1 shell · 97.2K (49%)  ctrl+p commands
+  └──── activity ────┘   └───────────── location ─────────────┘  └───────── usage ─────────┘
 ```
 
 ## Behavior
 
+- Hidden on the home / new-session screen; it appears once a session is open.
+- Prefixes the OS account and machine hostname as `user@host` (`dev@modulixs.com`).
 - Shows the absolute path of the session directory (`/home/me/project`).
-- Appends the git branch when the directory is a git repository and `git` is installed (`/home/me/project:main`).
+- Appends the git branch when the directory is a git repository and `git` is installed
+  (`dev@modulixs.com:/home/me/project:main`).
 - Updates when you switch sessions, change directory (`session.cd`), or move a session to another worktree.
 - OpenCode itself only renders the location while a session is idle. This plugin keeps the path visible while the
   model is working as well.
